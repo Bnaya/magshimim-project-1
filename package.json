@@ -1,0 +1,25 @@
+{
+  "name": "yet-another-express-mongo-example-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Bnaya Peretz",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/body-parser": "^1.19.0",
+    "@types/express": "^4.17.7",
+    "@types/mongodb": "^3.5.26",
+    "@types/mongoose": "^5.7.36"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "mongodb": "^3.6.0",
+    "mongodb-memory-server-global": "^6.6.6",
+    "mongoose": "^5.10.0"
+  }
+}
