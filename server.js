@@ -6,6 +6,8 @@ const mongodb = require('mongodb');
 const bodyParser = require('body-parser');
 const { MongoMemoryServer } =  require('mongodb-memory-server')
 
+const HTTP_PORT = process.env.HTTP_PORT || 8080;
+
 const mongoServer = new MongoMemoryServer({
   instance: {
     dbName: "ourdb"
@@ -42,7 +44,7 @@ async function main() {
   expressApp.use(bodyParser.json());
 
   await new Promise((resolve, reject) => {
-    expressApp.listen(8080, (error) => {
+    expressApp.listen(HTTP_PORT, (error) => {
       if (error) {
         reject(error)
       } else {
@@ -83,6 +85,7 @@ async function main() {
 main()
 .then((doneValue) => {
   console.info('done', doneValue);
+  console.log(`http://localhost:${HTTP_PORT}`)
 }, (error) => {
   console.error(error);
 });
