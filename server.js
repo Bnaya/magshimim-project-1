@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const { Schema, Model } = require('mongoose');
 const mongoose = require('mongoose');
+const cors = require('cors');
 const HTTP_PORT = process.env.HTTP_PORT || 8080;
 
 const CarSchema = new Schema({
@@ -46,7 +47,7 @@ function wrapExpressHandler(handler) {
     .then((data) => {
       res.send(data);
     }, (error) => {
-      res.status(502).send(error);
+      res.status(502).send({ error });
     });
   }
 
@@ -68,6 +69,11 @@ async function main() {
   // const carsCollection = connection.db("ourdb").collection('cars');
 
   const expressApp = express();
+
+  expressApp.use(cors({
+    origin: ["http://localhost:3000"]
+  }))
+
   expressApp.use(bodyParser.json());
 
   await new Promise((resolve, reject) => {
