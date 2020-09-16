@@ -8,6 +8,7 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 const { Schema, Model } = require('mongoose');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const { Cars } = require('./our-ui/src/Cars');
 const HTTP_PORT = process.env.HTTP_PORT || 8080;
 
 const CarSchema = new Schema({
@@ -63,6 +64,13 @@ async function main() {
 
   const CarModel = mongooseConnection.model("Car", CarSchema);
 
+  const modelsToExpose = [
+    {
+      slug: "cars",
+      theModel: CarModel
+    }
+  ];
+
   console.log({ uri });
   // const connection = await mongodb.connect(uri);
 
@@ -86,33 +94,63 @@ async function main() {
     });
   });
 
-  expressApp.delete('/cars/:id', wrapExpressHandler(async (request) => {
-    return await CarModel.findByIdAndDelete(request.params.id).exec();
-  }));
+  for (const { theModel, slug } of modelsToExpose) {
+    expressApp.delete(`/${slug}/:id`, wrapExpressHandler(async (request) => {
+      return await theModel.findByIdAndDelete(request.params.id).exec();
+    }));
 
-  expressApp.put('/cars/:id', wrapExpressHandler(async (request) => {
-    return await CarModel.findByIdAndUpdate(request.params.id, request.body).exec();
-  }));
+    expressApp.put(`/${slug}/:id`, wrapExpressHandler(async (request) => {
+      return await theModel.findByIdAndUpdate(request.params.id, request.body).exec();
+    }));
 
-  expressApp.get('/cars', wrapExpressHandler(async (request) => {
-    // const cursor = carsCollection.find();
-    // const carsArray = await cursor.toArray();
-    // await cursor.close();
-    // return carsArray;
-    return await CarModel.find().exec();
-  }));
+    expressApp.get(`/${slug}`, wrapExpressHandler(async (request) => {
+      // const cursor = carsCollection.find();
+      // const carsArray = await cursor.toArray();
+      // await cursor.close();
+      // return carsArray;
+      return await theModel.find().exec();
+    }));
+
+    // expressApp.post(`/${slug}`, wrapExpressHandler(async (request) => {
+    //   const [inserted] = await theModel.insertMany([request.body]);
+    //   // const r = await carsCollection.insertOne(request.body);
+    //   return inserted;
+    // }));
+
+    expressApp.post(`/${slug}`, wrapExpressHandler(async (request) => {
+      const [inserted] = await theModel.insertMany([request.body]);
+      // const r = await carsCollection.insertOne(request.body);
+      return inserted;
+    }));
+  }
+
+  // expressApp.delete('/cars/:id', wrapExpressHandler(async (request) => {
+  //   return await CarModel.findByIdAndDelete(request.params.id).exec();
+  // }));
+
+  // expressApp.put('/cars/:id', wrapExpressHandler(async (request) => {
+  //   return await CarModel.findByIdAndUpdate(request.params.id, request.body).exec();
+  // }));
+
+  // expressApp.get('/cars', wrapExpressHandler(async (request) => {
+  //   // const cursor = carsCollection.find();
+  //   // const carsArray = await cursor.toArray();
+  //   // await cursor.close();
+  //   // return carsArray;
+  //   return await CarModel.find().exec();
+  // }));
+
+  // // expressApp.post('/cars', wrapExpressHandler(async (request) => {
+  // //   const [inserted] = await CarModel.insertMany([request.body]);
+  // //   // const r = await carsCollection.insertOne(request.body);
+  // //   return inserted;
+  // // }));
 
   // expressApp.post('/cars', wrapExpressHandler(async (request) => {
   //   const [inserted] = await CarModel.insertMany([request.body]);
   //   // const r = await carsCollection.insertOne(request.body);
   //   return inserted;
   // }));
-
-  expressApp.post('/cars', wrapExpressHandler(async (request) => {
-    const [inserted] = await CarModel.insertMany([request.body]);
-    // const r = await carsCollection.insertOne(request.body);
-    return inserted;
-  }));
 
   // await carsCollection.insert({
   //   name: "Grand Vitara",
